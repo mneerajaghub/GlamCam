@@ -210,4 +210,6 @@ if __name__ == "__main__":
     print("=" * 60)
     print("\n🌐 Open http://localhost:8000 in your browser\n")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Read port from environment variable (for Render deployment)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

@@ -11,3 +11,7 @@ webcolors
 google-generativeai
 jinja2
 aiofiles
+colorthief
+colormath
+deepface
+stone
