@@ -1,132 +1,325 @@
-# 💄 GlamCam - AI Virtual Stylist
+# GlamCam — AI Virtual Stylist with Computer Vision & Gemini
 
-An AI-powered virtual styling assistant that combines Computer Vision and Google Gemini to provide personalized fashion recommendations based on your skin tone and outfit colors.
+## Project Description
 
-## ✨ Features
+GlamCam is a real-time AI-powered virtual styling assistant that analyzes a user's selfie and outfit image using Computer Vision, Color Science, and Google Gemini AI.
 
-- **🧑 Skin Tone Analysis**: Uses MediaPipe face mesh to detect skin regions and classify skin tone (Fair to Deep) with undertone detection (Warm/Cool/Neutral)
-- **👗 Outfit Color Extraction**: K-means clustering to identify dominant colors in clothing images
-- **🎨 Color Harmony Scoring**: Rule-based compatibility scoring (0-100%) between skin tone and outfit colors
-- **💄 AI Styling Recommendations**: Gemini-powered suggestions for:
-  - Makeup (foundation, lips, eyes, blush)
-  - Hairstyles and hair color
-  - Accessories (jewelry, bags, shoes)
-  - Alternative outfit colors and combinations
+It provides:
 
-## 🛠️ Tech Stack
+- Personalized makeup recommendations  
+- Outfit harmony scoring  
+- Accessories suggestions  
+- AI-powered virtual try-on preview  
 
-- **Backend**: Python, FastAPI
-- **Computer Vision**: OpenCV, MediaPipe
-- **Color Analysis**: scikit-learn (K-means), webcolors
-- **AI**: Google Gemini 1.5 Flash
-- **Frontend**: HTML5, CSS3, JavaScript
+The system combines:
 
-## 📦 Installation
+- 12-Season Color Analysis  
+- Monk Skin Tone Scale mapping  
+- CIE Delta E 2000 perceptual color science  
+- Gemini multimodal AI  
 
-1. **Create virtual environment** (recommended):
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-# or
-source venv/bin/activate  # Mac/Linux
+Built for TinkHerHack 2026.
+
+---
+
+## Live Demo
+
+**Demo Video:**  
+https://youtu.be/HiwQNv-nhj8 
+
+---
+
+## Features
+
+### Computer Vision Engine
+
+- 12-Season Color Analysis (Light Spring → Bright Winter)
+- Monk Skin Tone Scale mapping (MST-1 to MST-10)
+- MediaPipe 478 facial landmark detection
+- Dominant outfit color extraction using K-Means clustering
+
+### Color Science
+
+- CIE Delta E 2000 harmony scoring
+- Warm / Cool undertone detection
+- Outfit temperature matching
+- Harmony score (0–100) with semantic rating
+
+### AI-Powered Styling
+
+- Gemini 2.0 Flash for contextual styling advice
+- Occasion-aware recommendations (casual, formal, party, business, date)
+- Structured AI prompting with fallback rule engine
+
+### Virtual Try-On
+
+- Gemini image generation for photorealistic preview
+- MediaPipe-based fallback virtual makeup overlay
+- Real-time processing pipeline
+
+---
+
+## Tech Stack
+
+### Backend
+- Python 3.13
+- FastAPI
+- Uvicorn
+
+### Computer Vision
+- OpenCV
+- MediaPipe Face Mesh
+
+### Machine Learning
+- DeepFace
+- stone (Monk Skin Tone Scale)
+
+### Color Science
+- colormath (CIE Delta E 2000)
+- ColorThief
+- scikit-learn (K-Means)
+
+### AI
+- Google Gemini 2.0 Flash
+- Gemini Image Generation API
+
+### Frontend
+- HTML5
+- CSS3
+- Vanilla JavaScript
+
+### Deployment
+- Render / Railway / GCP
+
+---
+
+## Architecture
+
+```
+User Uploads Images
+        ↓
+FastAPI Backend
+        ↓
+Skin Analyzer (MediaPipe + DeepFace)
+        ↓
+Outfit Analyzer (ColorThief + KMeans)
+        ↓
+Harmony Engine (CIE Delta E 2000)
+        ↓
+Gemini AI Stylist
+        ↓
+Virtual Try-On Generator
+        ↓
+JSON Response to Frontend
 ```
 
-2. **Install dependencies**:
+Detailed diagrams available in `docs/architecture.md`
+
+---
+
+## Project Structure
+
+```
+glamcam/
+│
+├── main.py
+├── requirements.txt
+├── README.md
+├── LICENSE
+├── .gitignore
+│
+├── modules/
+│   ├── skin_analyzer.py
+│   ├── outfit_analyzer.py
+│   ├── harmony_engine.py
+│   ├── stylist_ai.py
+│   └── image_generator.py
+│
+├── templates/
+│   └── index.html
+│
+├── static/
+│   ├── style.css
+│   ├── script.js
+│   └── images/
+│
+└── docs/
+    ├── architecture.md
+    └── screenshots/
+```
+
+- Lowercase folder names  
+- No spaces in filenames  
+- Modular backend structure  
+- No single giant file  
+
+---
+
+## Installation
+
+### Prerequisites
+
+- Python 3.13 or higher
+- pip package manager
+- Git
+- 2GB RAM minimum (4GB recommended for ML models)
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/GlamCam.git
+cd GlamCam
+```
+
+### Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Set up Gemini API key** (optional but recommended):
+### Set Up Environment Variables
+
+1. Copy the example environment file:
 ```bash
-set GEMINI_API_KEY=your_api_key_here  # Windows
-# or
-export GEMINI_API_KEY=your_api_key_here  # Mac/Linux
+cp .env.example .env
 ```
 
-Get your free API key at: https://makersuite.google.com/app/apikey
+2. Add your Gemini API key to `.env`:
+```bash
+GEMINI_API_KEY=your_actual_api_key_here
+```
 
-## 🚀 Running the App
+**Get your free Gemini API key**: https://aistudio.google.com/app/apikey
+
+### Run the Application
 
 ```bash
 python main.py
 ```
 
-Then open **http://localhost:8000** in your browser.
+The server will start at `http://localhost:8000`
 
-## 📸 How to Use
+### Access the Web Interface
 
-1. **Upload a Selfie**: Clear face photo for skin tone analysis
-2. **Upload an Outfit**: Photo of the clothing you want to analyze
-3. **Select Occasion**: Choose the context (casual, formal, business, party, date)
-4. **Select Season/Weight**: Light, medium, or heavy clothing
-5. **Click Analyze**: Get your personalized style report!
-
-## 🧬 How It Works
-
-### Skin Tone Detection
-1. MediaPipe Face Mesh detects 478 facial landmarks
-2. Extracts pixels from cheek and forehead regions
-3. Calculates ITA (Individual Typology Angle) for skin tone classification
-4. Analyzes RGB ratios for undertone detection
-
-### Color Extraction
-1. Preprocesses outfit image to remove background noise
-2. Applies K-means clustering with 5 clusters
-3. Returns dominant color with percentage and color name
-
-### Harmony Calculation
-1. Uses color theory rules mapped to skin tone + undertone combinations
-2. Checks outfit color against best/good/avoid lists
-3. Adjusts score based on saturation and contrast
-4. Generates explanation and alternatives
-
-### AI Recommendations
-1. Compiles analysis into structured prompt
-2. Sends to Gemini API for personalized suggestions
-3. Falls back to rule-based recommendations if API unavailable
-
-## 📁 Project Structure
-
+Open your browser and navigate to:
 ```
-GlamCam/
-├── main.py                 # FastAPI application
-├── requirements.txt        # Python dependencies
-├── README.md              # This file
-├── modules/
-│   ├── __init__.py
-│   ├── skin_analyzer.py   # Skin tone detection
-│   ├── outfit_analyzer.py # Color extraction
-│   ├── harmony_engine.py  # Compatibility scoring
-│   └── stylist_ai.py      # Gemini integration
-├── templates/
-│   └── index.html         # Web UI template
-└── static/
-    ├── style.css          # Styling
-    └── script.js          # Frontend logic
+http://localhost:8000
 ```
 
-## 🎯 API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Main web interface |
-| `/analyze` | POST | Full style analysis |
-| `/analyze-skin-only` | POST | Only skin analysis |
-| `/analyze-outfit-only` | POST | Only outfit analysis |
-| `/health` | GET | Health check |
 
-## 🔧 Configuration
 
-The app works with or without a Gemini API key:
-- **With API key**: Full AI-powered recommendations
-- **Without API key**: Rule-based fallback recommendations
+---
 
-## 📝 License
+## API Documentation
 
-MIT License - Feel free to use and modify!
+### Endpoints
 
-## 🙏 Acknowledgments
+#### GET /
+Main web interface
 
-- MediaPipe for face mesh detection
-- Google Gemini for AI recommendations
-- Color theory resources for harmony rules
+#### POST /analyze
+Performs full skin + outfit analysis
+
+Form fields:
+- `selfie` (image file)
+- `outfit` (image file)
+- `occasion` (string)
+- `outfit_weight` (light / medium / heavy)
+
+#### POST /generate-look
+Generates virtual try-on preview
+
+#### POST /analyze-skin-only
+Skin tone analysis only
+
+#### POST /analyze-outfit-only
+Outfit color analysis only
+
+#### GET /health
+Health check endpoint
+```
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8000/analyze \
+  **Nandhana S** - Full Stack Developer, Computer Vision Engineer
+- **Neeraja Manohar** - AI/ML Engineer, Color Science Specialistt_outfit.jpg" \
+  -F "occasion=casual" \
+  -F "outfit_weight=medium"
+```
+
+### Example Response
+
+```json
+{
+  "skin_analysis": {
+    "tone": "Medium",
+    "undertone": "Warm",
+    "season": "Warm Autumn",
+    "mst_value": 5,
+    "ita_angle": 41.2,
+    "recommendations": ["Earth tones", "Olive green", "Warm browns"]
+  },
+  "outfit_analysis": {
+    "dominant_color": "Navy Blue",
+    "color_family": "Blue",
+    "temperature": "Cool",
+    "outfit_colors": [
+      {"name": "Navy", "hex": "#000080", "rgb": [0, 0, 128]},
+      {"name": "White", "hex": "#FFFFFF", "rgb": [255, 255, 255]}
+    ]
+  },
+  "harmony_score": 78,
+  "harmony_rating": "Good",
+  "ai_recommendations": {
+    "styling_tips": ["Pair with warm accessories", "Add gold jewelry"],
+    "makeup_suggestions": ["Warm bronze eyeshadow", "Coral blush"],
+    "accessories": ["Gold hoop earrings", "Brown leather bag"],
+    "colors_to_try": ["Olive", "Terracotta", "Cream"],
+    "colors_to_avoid": ["Icy pastels", "Pure black"]
+  }
+}
+
+---
+
+## Team Members
+
+- Nandhana S 
+- Neeraja Manohar  
+
+---
+
+## AI Tools Used
+
+- Google Gemini 2.0 Flash  
+- Gemini Image Generation API  
+- DeepFace  
+- MediaPipe  
+- OpenCV  
+
+---
+
+## Root Files Checklist
+
+- README.md  
+- LICENSE  
+- .gitignore  
+- requirements.txt  
+
+---
+
+## Deployment Checklist
+
+- HTTPS live link  
+- No runtime errors  
+- Environment variables secured  
+- Production-ready FastAPI server  
+
+---
+
+## License
+
+This project is licensed under the MIT License.  
+See `LICENSE` file for details.
