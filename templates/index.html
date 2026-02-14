@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlamCam — AI Virtual Stylist</title>
+    <link rel="stylesheet" href="/static/style.css?v=16">
+</head>
+<body>
+    <div class="app">
+        <!-- Elegant Header -->
+        <header class="header">
+            <div class="brand">
+                <span class="brand-icon">◇</span>
+                <h1 class="brand-name">GlamCam</h1>
+            </div>
+            <p class="brand-tagline">Your Personal AI Stylist</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="section-header">
+                    <span class="section-number">01</span>
+                    <h2>Upload Your Photos</h2>
+                </div>
+                
+                <form id="analyzeForm" enctype="multipart/form-data">
+                    <div class="upload-grid">
+                        <!-- Selfie Upload -->
+                        <div class="upload-card" id="selfieCard">
+                            <div class="card-label">Portrait</div>
+                            <div class="upload-zone" id="selfieArea">
+                                <input type="file" id="selfieInput" name="selfie" accept="image/*" required>
+                                <label for="selfieInput" class="upload-content">
+                                    <div class="upload-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="12" cy="8" r="4"/>
+                                            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                                        </svg>
+                                    </div>
+                                    <span class="upload-text">Drop your selfie here</span>
+                                    <span class="upload-hint">or click to browse</span>
+                                </label>
+                                <img id="selfiePreview" class="preview-img" alt="">
+                            </div>
+                        </div>
+
+                        <!-- Outfit Upload -->
+                        <div class="upload-card" id="outfitCard">
+                            <div class="card-label">Outfit</div>
+                            <div class="upload-zone" id="outfitArea">
+                                <input type="file" id="outfitInput" name="outfit" accept="image/*" required>
+                                <label for="outfitInput" class="upload-content">
+                                    <div class="upload-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                                            <path d="M3 6h18"/>
+                                            <path d="M16 10a4 4 0 01-8 0"/>
+                                        </svg>
+                                    </div>
+                                    <span class="upload-text">Drop your outfit here</span>
+                                    <span class="upload-hint">or click to browse</span>
+                                </label>
+                                <img id="outfitPreview" class="preview-img" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options Row -->
+                    <div class="options-row">
+                        <div class="select-wrapper">
+                            <label>Occasion</label>
+                            <select id="occasion" name="occasion">
+                                <option value="casual">Everyday Casual</option>
+                                <option value="formal">Formal Event</option>
+                                <option value="business">Business Meeting</option>
+                                <option value="party">Evening Party</option>
+                                <option value="date">Date Night</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <label>Season</label>
+                            <select id="outfit_weight" name="outfit_weight">
+                                <option value="light">Summer</option>
+                                <option value="medium" selected>Spring / Autumn</option>
+                                <option value="heavy">Winter</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-primary" id="analyzeBtn">
+                        <span>Analyze My Style</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loadingState" class="loading-section hidden">
+                <div class="loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                    <div class="loader-ring"></div>
+                </div>
+                <p class="loading-text">Analyzing your unique style...</p>
+                <div class="loading-steps">
+                    <div class="step" id="step1"><span class="step-dot"></span>Detecting skin tone</div>
+                    <div class="step" id="step2"><span class="step-dot"></span>Analyzing outfit</div>
+                    <div class="step" id="step3"><span class="step-dot"></span>Calculating harmony</div>
+                    <div class="step" id="step4"><span class="step-dot"></span>Generating recommendations</div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                
+                <!-- Hero Result: Season -->
+                <div class="result-hero">
+                    <span class="result-label">Your Color Season</span>
+                    <h2 class="season-title" id="seasonBadge">—</h2>
+                    <p class="season-desc" id="seasonDescription">—</p>
+                </div>
+
+                <!-- Season Palette Visualization -->
+                <div class="palette-section">
+                    <div class="palette-header">
+                        <h3>Your Personal Color Palette</h3>
+                        <p class="palette-subtitle">Colors that harmonize with your natural coloring</p>
+                    </div>
+                    <div class="palette-container">
+                        <div class="palette-group">
+                            <span class="palette-label">✓ Best Colors</span>
+                            <div class="palette-swatches" id="bestColorsPalette"></div>
+                        </div>
+                        <div class="palette-group">
+                            <span class="palette-label">○ Good Colors</span>
+                            <div class="palette-swatches" id="goodColorsPalette"></div>
+                        </div>
+                        <div class="palette-group palette-avoid">
+                            <span class="palette-label">✕ Avoid</span>
+                            <div class="palette-swatches" id="avoidColorsPalette"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Grid -->
+                <div class="analysis-grid">
+                    
+                    <!-- Skin Analysis Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Skin Analysis</h3>
+                            <span class="card-icon">◐</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="color-preview">
+                                <div class="color-swatch large" id="skinColorSwatch"></div>
+                                <div class="color-info">
+                                    <span class="color-name" id="skinTone">—</span>
+                                    <span class="color-meta" id="skinRGB">—</span>
+                                </div>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat">
+                                    <span class="stat-label">Undertone</span>
+                                    <span class="stat-value" id="undertone">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Temperature</span>
+                                    <span class="stat-value" id="dimTemperature">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Value</span>
+                                    <span class="stat-value" id="dimValue">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Chroma</span>
+                                    <span class="stat-value" id="dimChroma">—</span>
+                                </div>
+                            </div>
+                            <div class="monk-scale-row" id="monkScaleRow" style="display:none;">
+                                <span class="monk-label">Monk Scale</span>
+                                <span class="monk-badge" id="monkScale">—</span>
+                            </div>
+                            <div class="deepface-row" id="deepfaceRow" style="display:none;">
+                                <span class="deepface-label">ML Analysis</span>
+                                <span class="deepface-badge" id="deepfaceResult">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Outfit Analysis Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Outfit Analysis</h3>
+                            <span class="card-icon">◑</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="color-preview">
+                                <div class="color-swatch large" id="outfitColorSwatch"></div>
+                                <div class="color-info">
+                                    <span class="color-name" id="outfitColor">—</span>
+                                    <span class="color-meta" id="outfitHex">—</span>
+                                </div>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat">
+                                    <span class="stat-label">Family</span>
+                                    <span class="stat-value" id="colorFamily">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Temperature</span>
+                                    <span class="stat-value" id="colorTemp">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Best Seasons</span>
+                                    <span class="stat-value" id="seasonAffinity">—</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Confidence</span>
+                                    <span class="stat-value" id="matchConfidence">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Harmony Score Card -->
+                    <div class="card card-harmony">
+                        <div class="card-header">
+                            <h3>Color Harmony</h3>
+                            <span class="card-icon">◉</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="harmony-visual">
+                                <div class="score-ring" id="harmonyCircle">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="ring-bg" cx="50" cy="50" r="45"/>
+                                        <circle class="ring-progress" cx="50" cy="50" r="45" id="scoreRing"/>
+                                    </svg>
+                                    <div class="score-inner">
+                                        <span class="score-num" id="harmonyScore">0</span>
+                                    </div>
+                                </div>
+                                <div class="harmony-meta">
+                                    <span class="harmony-rating" id="harmonyRating">—</span>
+                                    <p class="harmony-desc" id="harmonyExplanation">—</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="recommendations">
+                    <div class="section-header">
+                        <span class="section-number">02</span>
+                        <h2>Style Recommendations</h2>
+                    </div>
+
+                    <div class="rec-grid">
+                        <!-- Makeup/Grooming -->
+                        <div class="rec-card">
+                            <div class="rec-icon" id="makeupIcon">💄</div>
+                            <h4 id="makeupTitle">Makeup</h4>
+                            <ul class="rec-list">
+                                <li><span id="foundationLabel">Foundation:</span> <span id="foundationTip">—</span></li>
+                                <li><span id="lipsLabel">Lips:</span> <span id="lipColors">—</span></li>
+                                <li><span id="eyesLabel">Eyes:</span> <span id="eyeMakeup">—</span></li>
+                                <li><span id="blushLabel">Blush:</span> <span id="blush">—</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Hair -->
+                        <div class="rec-card">
+                            <div class="rec-icon">💇</div>
+                            <h4>Hairstyle</h4>
+                            <ul class="rec-list">
+                                <li><span>Style:</span> <span id="hairstyleSuggestion">—</span></li>
+                                <li><span>Color:</span> <span id="hairColorTips">—</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Accessories -->
+                        <div class="rec-card">
+                            <div class="rec-icon">💎</div>
+                            <h4>Accessories</h4>
+                            <ul class="rec-list">
+                                <li><span>Metal:</span> <span id="jewelryMetal">—</span></li>
+                                <li><span>Style:</span> <span id="jewelryStyle">—</span></li>
+                                <li><span>Bag:</span> <span id="bagColor">—</span></li>
+                                <li><span>Shoes:</span> <span id="shoes">—</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Colors -->
+                        <div class="rec-card">
+                            <div class="rec-icon">🎨</div>
+                            <h4>Color Palette</h4>
+                            <div class="color-tags" id="betterColors"></div>
+                            <ul class="rec-list" id="colorCombos"></ul>
+                            <p class="rec-patterns"><span>Patterns:</span> <span id="patterns">—</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Outfit Suggestions Section -->
+                    <div class="outfit-suggestions-section" id="outfitSuggestionsSection">
+                        <div class="section-header">
+                            <span class="section-number">03</span>
+                            <h2 id="outfitSuggestionsTitle">Outfit Suggestions</h2>
+                        </div>
+                        <p class="outfit-subtitle" id="outfitSubtitle">Perfect outfits for your occasion</p>
+                        <div class="outfit-suggestions-grid" id="outfitSuggestionsGrid">
+                            <!-- Outfits will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Curated Accessories Section -->
+                    <div class="accessories-section" id="accessoriesSection">
+                        <div class="section-header">
+                            <span class="section-number">04</span>
+                            <h2>Shop Curated Accessories</h2>
+                        </div>
+                        <p class="accessories-subtitle">Hand-picked pieces that complement your style</p>
+                        <div class="accessories-grid" id="accessoriesGrid">
+                            <!-- Accessories will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Key Insight -->
+                    <div class="key-insight">
+                        <div class="insight-icon">✦</div>
+                        <p id="overallTip">—</p>
+                    </div>
+                </div>
+
+                <!-- Restart -->
+                <button class="btn-secondary" onclick="resetAnalysis()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 4v6h6M23 20v-6h-6"/>
+                        <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+                    </svg>
+                    <span>Analyze Another Look</span>
+                </button>
+            </section>
+
+            <!-- Error -->
+            <div id="errorMessage" class="error-toast hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M15 9l-6 6M9 9l6 6"/>
+                </svg>
+                <p id="errorText">Something went wrong</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by Computer Vision & Gemini AI</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js?v=11"></script>
+</body>
+</html>

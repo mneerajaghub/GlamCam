@@ -1,0 +1,13 @@
+# AI Virtual Stylist - Dependencies
+fastapi
+uvicorn
+python-multipart
+opencv-python
+numpy
+mediapipe>=0.10.30
+scikit-learn
+pillow
+webcolors
+google-generativeai
+jinja2
+aiofiles
